@@ -8,6 +8,7 @@ let [qstnNo, setQstnNo] = useState(0);
 let [question, setQuestion] = useState(data[qstnNo]);
 let [lockOption, setLockOption] = useState(false);
 let [score, setScore] = useState(0);
+let [result, setResult] = useState(false)
 
 let Option1 = useRef(null)
 let Option2 = useRef(null)
@@ -35,6 +36,11 @@ const checkingAnser= (e, ans)=>{
 
 const nextButton = () =>{
    if(lockOption===true){
+    if (qstnNo + 1 === data.length) {
+        setResult(true);
+        return ;
+    }
+
     setQstnNo(++qstnNo);
     setQuestion(data[qstnNo]);
     setLockOption(false);
@@ -46,20 +52,35 @@ const nextButton = () =>{
    }
 }
 
+const resetbutton = ()=>{
+    setQstnNo(0);
+    setQuestion(data[0]);
+    setScore(0);
+    setLockOption(0);
+    setResult(false);
+}
+
   return (
     <div className="container">
       <h1>Quiz App</h1>
       <hr />
       <div className="index"> {qstnNo+1} of {data.length}</div>
-      <h2>{qstnNo+1}. {question.question}</h2>
-      <ul>
-        <li ref ={Option1} onClick={(e)=>{checkingAnser(e,1)}}>{question.option1}</li>
-        <li ref ={Option2} onClick={(e)=>{checkingAnser(e,2)}}>{question.option2}</li>
-        <li ref ={Option3} onClick={(e)=>{checkingAnser(e,3)}}>{question.option3}</li>
-        <li ref ={Option4} onClick={(e)=>{checkingAnser(e,4)}}>{question.option4}</li>
-      </ul>
-      <button onClick={nextButton}>Next</button>
-    </div>
+      {!result && <>
+  <h2>{qstnNo+1}. {question.question}</h2>      
+  <ul>
+    <li ref={Option1} onClick={(e)=>{checkingAnser(e,1)}}>{question.option1}</li>
+    <li ref={Option2} onClick={(e)=>{checkingAnser(e,2)}}>{question.option2}</li>
+    <li ref={Option3} onClick={(e)=>{checkingAnser(e,3)}}>{question.option3}</li>
+    <li ref={Option4} onClick={(e)=>{checkingAnser(e,4)}}>{question.option4}</li>
+  </ul>
+  <button onClick={nextButton}>Next</button>
+</>}
+
+{result && <>
+  <h2>You Score {score} Out of {data.length}</h2>
+  <button onClick={resetbutton}>Reset</button>
+</>}
+</div>
   );
 };
 
