@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import "./Quiz.css";
 import { data } from '../../assets/data';
 
@@ -6,29 +6,59 @@ const Quiz = () => {
 
 let [qstnNo, setQstnNo] = useState(0);
 let [question, setQuestion] = useState(data[qstnNo]);
+let [lockOption, setLockOption] = useState(false);
+let [score, setScore] = useState(0);
+
+let Option1 = useRef(null)
+let Option2 = useRef(null)
+let Option3 = useRef(null)
+let Option4 = useRef(null)
+
+let OptionArray = [Option1,Option2,Option3,Option4]     
 
 const checkingAnser= (e, ans)=>{
 
-  if (question.ans===ans) {
-    e.target.classList.add('correct')
-  }else{
-    e.target.classList.add('wrong')
-  }
+    if (lockOption===false) {
+        if (question.ans===ans) {
+            e.target.classList.add('correct')   //correct answer
+            setLockOption(true)       //if answer is wrong or correct lock the option
+            setScore(prev=>prev+1)    //setting score
+          }else{
+            e.target.classList.add('wrong')   //wrong answer
+            setLockOption(true)     //if answer is wrong or correct lock the option
+            OptionArray[question.ans-1].current.classList.add('correct') //show the correct answer if user chooses wrong
+          }
+    }
+}
+
+//next button 
+
+const nextButton = () =>{
+   if(lockOption===true){
+    setQstnNo(++qstnNo);
+    setQuestion(data[qstnNo]);
+    setLockOption(false);
+
+    OptionArray.forEach((option) => {
+        option.current.classList.remove("wrong");
+        option.current.classList.remove("correct");
+      });
+   }
 }
 
   return (
     <div className="container">
       <h1>Quiz App</h1>
       <hr />
-      <div className="index">1 of 5 questions</div>
+      <div className="index"> {qstnNo+1} of {data.length}</div>
       <h2>{qstnNo+1}. {question.question}</h2>
       <ul>
-        <li onClick={(e)=>{checkingAnser(e,1)}}>{question.option1}</li>
-        <li onClick={(e)=>{checkingAnser(e,2)}}>{question.option2}</li>
-        <li onClick={(e)=>{checkingAnser(e,3)}}>{question.option3}</li>
-        <li onClick={(e)=>{checkingAnser(e,4)}}>{question.option4}</li>
+        <li ref ={Option1} onClick={(e)=>{checkingAnser(e,1)}}>{question.option1}</li>
+        <li ref ={Option2} onClick={(e)=>{checkingAnser(e,2)}}>{question.option2}</li>
+        <li ref ={Option3} onClick={(e)=>{checkingAnser(e,3)}}>{question.option3}</li>
+        <li ref ={Option4} onClick={(e)=>{checkingAnser(e,4)}}>{question.option4}</li>
       </ul>
-      <button>Next</button>
+      <button onClick={nextButton}>Next</button>
     </div>
   );
 };
